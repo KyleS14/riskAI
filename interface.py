@@ -39,15 +39,22 @@ def display_image(img_cv):
 def detect_edges():
     global regions
 
-    if img_cv is None:
-        return
-
     # Step 1: Convert to grayscale and detect edges
     gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
-    edges = cv2.Canny(gray, 100, 200)
+    
+
+
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    edges = cv2.adaptiveThreshold(blurred, 255,
+                              cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                              cv2.THRESH_BINARY_INV, 11, 2)
+    
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    edges = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel)
+
 
     # Step 2: Find contours
-    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     regions = [cv2.approxPolyDP(cnt, 3, True) for cnt in contours]
 
     # Step 3: Create a labeled version of the edge image
@@ -62,8 +69,7 @@ def detect_edges():
             cv2.putText(labeled_img, str(idx + 1), (cx, cy),
             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
         # Optionally draw the contour as well
-            if idx==0:
-                cv2.drawContours(labeled_img, [contour], -1, (255, 0, 0), 1)
+            cv2.drawContours(labeled_img, [contour], -1, (255, 0, 0), 1)
     # Step 4: Display labeled image and update region count
     display_image(labeled_img)
     region_label.config(text=f"Detected Regions: {len(regions)}")
@@ -78,16 +84,104 @@ detect_edges()
 #assigned regions to territories
 
 def on_click(event):
-    print(f"Mouse clicked at {event.x}, {event.y}")
+    #print(f"Mouse clicked at {event.x}, {event.y}")
     for i, region in enumerate(regions):
+        region_num = i+1
         if cv2.pointPolygonTest(region, (event.x, event.y), False) >= 0:
-            print(f"Clicked inside region {i + 1}")
-            break
+            print(f"Clicked inside region {region_num}")
+            if region_num == 163:
+                region_name = "Alaska"
+            elif region_num == 169:
+                region_name = "Northwest Territory"
+            elif region_num == 177:
+                region_name = "Greenland"
+            elif region_num == 178:
+                pass #prevent double greenland repeat
+            elif region_num == 140:
+                region_name = "Alberta"
+            elif region_num == 139:
+                region_name = "Ontario"
+            elif region_num == 143:
+                region_name = "Quebec"
+            elif region_num == 114:
+                region_name = "Western United States"
+            elif region_num == 112:
+                region_name = "Eastern United States"
+            elif region_num == 86:
+                region_name = "Central America"
+            elif region_num == 64:
+                region_name = "Venezuela"
+            elif region_num == 54:
+                region_name = "Peru"
+            elif region_num == 56:
+                region_name = "Brazil"
+            elif region_num == 25:
+                region_name = "Argentina"
+            elif region_num == 15:
+                region_name = "South Africa"
+            elif region_num == 9:
+                region_name = "Madagascar"
+            elif region_num == 29:
+                region_name = "Congo"
+            elif region_num == 49:
+                region_name = "East Africa"
+            elif region_num == 67:
+                region_name = "North Africa"
+            elif region_num == 61:
+                region_name = "Egypt"
+            elif region_num == 145:
+                region_name = "Iceland"
+            elif region_num == 127 or region_num == 130:
+                region_name = "Great Britain"
+            elif region_num == 95:
+                region_name = "Western Europe"
+            elif region_num == 94:
+                region_name = "Southern Europe"
+            elif region_num == 122:
+                region_name = "Nothern Europe"
+            elif region_num == 161:
+                region_name = "Scandinavia"
+            elif region_num == 160:
+                region_name = "Ukraine"
+            elif region_num == 78:
+                region_name = "Middle East"
+            elif region_num == 113:
+                region_name = "Afghanistan"
+            elif region_num == 83:
+                region_name = "India"
+            elif region_num == 167:
+                region_name = "Ural"
+            elif region_num == 175:
+                region_name = "Siberia"
+            elif region_num == 172:
+                region_name = "Yakutsk"
+            elif region_num == 144:
+                region_name = "Irkutsk"
+            elif region_num == 168:
+                region_name = "Kamchatka"
+            elif region_num == 120:
+                region_name = "Japan"
+            elif region_num == 118:
+                region_name = "Mongolia"
+            elif region_num == 107:
+                region_name = "China"
+            elif region_num == 69:
+                region_name = "Siam"
+            elif region_num == 28 or region_num == 36 or region_num == 27 or region_num == 17 or region_num == 20:
+                region_name = "Indonesia"
+            elif region_num == 43 or region_num == 44:
+                region_name = "New Guinea"
+            elif region_num ==  14:
+                region_name = "Western Australia"
+            elif region_num == 21:
+                region_name = "Eastern Australia"
+            elif region_num == 176:
+                pass #prevent not a region error
+            else:
+                print("Not a Region")
+    print(region_name)
 
 canvas.bind("<Button-1>", on_click)
-
-
-
 
 root.mainloop()
 
