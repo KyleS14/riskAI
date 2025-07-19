@@ -1,89 +1,12 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 import cv2
-#import numpy as np
-
-# Create main window
-root = tk.Tk()
-root.title("Edge Region Labeler")
-root.state("zoomed")
-
-# Canvas to display image
-canvas = tk.Label(root)
-canvas.pack()
-
-# Label to show number of regions
-region_label = tk.Label(root, text="Detected Regions: 0", font=("Arial", 14))
-region_label.pack(pady=5)
-
-# Global variables
-img_cv = None
-regions = []
-
-def open_image():
-
-    global img_cv
-    image_path = 'riskboard_resized.jpg'
-    img_cv = cv2.imread(image_path)
-    display_image(img_cv)
-    region_label.config(text="Detected Regions: 0")  # Reset label
-
-def display_image(img_cv):
-    img_rgb = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
-    img_pil = Image.fromarray(img_rgb)
-    img_tk = ImageTk.PhotoImage(img_pil)
-
-    canvas.configure(image=img_tk)
-    canvas.image = img_tk  # Keep reference
-
-def detect_edges():
-    global regions
-
-    # Step 1: Convert to grayscale and detect edges
-    gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
-    
+import numpy as np
 
 
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    edges = cv2.adaptiveThreshold(blurred, 255,
-                              cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                              cv2.THRESH_BINARY_INV, 11, 2)
-    
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-    edges = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel)
-
-
-    # Step 2: Find contours
-    contours, _ = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    regions = [cv2.approxPolyDP(cnt, 3, True) for cnt in contours]
-
-    # Step 3: Create a labeled version of the edge image
-    labeled_img = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
-
-    for idx, contour in enumerate(regions):
-        # Get center point of contour (via moments)
-        M = cv2.moments(contour)
-        if M["m00"] != 0:
-            cx = int(M["m10"] / M["m00"])
-            cy = int(M["m01"] / M["m00"])
-            cv2.putText(labeled_img, str(idx + 1), (cx, cy),
-            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
-        # Optionally draw the contour as well
-            cv2.drawContours(labeled_img, [contour], -1, (255, 0, 0), 1)
-    # Step 4: Display labeled image and update region count
-    display_image(labeled_img)
-    region_label.config(text=f"Detected Regions: {len(regions)}")
-
-# Buttons
-btn_frame = tk.Frame(root)
-btn_frame.pack(pady=10)
-
-open_image()
-detect_edges()
-
-#assigned regions to territories
-
+#gives name of region when clicked
 def on_click(event):
+    region_name = "Not a Region"
     #print(f"Mouse clicked at {event.x}, {event.y}")
     for i, region in enumerate(regions):
         region_num = i+1
@@ -95,8 +18,6 @@ def on_click(event):
                 region_name = "Northwest Territory"
             elif region_num == 177:
                 region_name = "Greenland"
-            elif region_num == 178:
-                pass #prevent double greenland repeat
             elif region_num == 140:
                 region_name = "Alberta"
             elif region_num == 139:
@@ -177,36 +98,88 @@ def on_click(event):
                 region_name = "Eastern Australia"
             elif region_num == 176:
                 pass #prevent not a region error
+            elif region_num == 178:
+                pass
+            elif region_num == 170:
+                pass
             else:
                 print("Not a Region")
     print(region_name)
 
-canvas.bind("<Button-1>", on_click)
 
-root.mainloop()
+# opens risk board image
+def open_image(canvas):
+
+    global img_cv
+    image_path = 'riskboard_resized.jpg'
+    img_cv = cv2.imread(image_path)
+
+
+    img_rgb = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
+    img_pil = Image.fromarray(img_rgb)
+    img_tk = ImageTk.PhotoImage(img_pil)
+
+    canvas.configure(image=img_tk)
+    canvas.image = img_tk
+
+
+#edge detector
+def detect_edges():
+    global regions
+
+    # Convert to grayscale and detect edges
+    gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+    
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    edges = cv2.adaptiveThreshold(blurred, 255,
+                              cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                              cv2.THRESH_BINARY_INV, 11, 2)
+    
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    edges = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel)
+
+
+    # Find contours
+    contours, _ = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    regions = [cv2.approxPolyDP(cnt, 3, True) for cnt in contours]
+
+    region_colors = {i: (0, 0, 0, 0) for i in range(len(regions))}
+
+    # Set initial region colors (BGR format)
+    region_colors[162] = (0, 0, 255)  # Alaska = red
+    region_colors[168] = (0, 255, 0)  # Kamchatka = green
+    region_colors[142] = (255, 0, 0)  # Quebec = blue
 
 
 
 
-'''
-import tkinter as tk
-from PIL import ImageTk,Image
+
+
+
+
+
+
+
+#overlaps the window over the edge detector
 
 def gamespace():
-    # Create the main window
     root = tk.Tk()
-    root.state('zoomed')
     root.title("Risk Game")
+    root.state("zoomed")
 
-    #creates risk background
-    image_path = "riskmap_resized.jpg"
-    original_image = Image.open(image_path)
-    tk_image = ImageTk.PhotoImage(original_image)
-    image_label = tk.Label(root, image=tk_image)
-    image_label.image = tk_image
-    image_label.pack(padx=5, pady=5)
+    canvas = tk.Label(root)
+    canvas.pack()
 
-    # Start the GUI event loop
+    #img_cv = None    kept here js in case
+    #regions = []
+
+    #open image and detect edges
+    open_image(canvas)
+    detect_edges()
+
+    #space does space function
+    canvas.bind("<Button-1>", on_click)
+
     root.mainloop()
 
 def on_space(event):
@@ -215,7 +188,9 @@ def on_space(event):
     gamespace()
 
 
-#opens gui window
+
+#Start Window
+
 root1 = tk.Tk()
 root1.geometry("895x473")
 root1.title("Risk Game")
@@ -234,4 +209,3 @@ text_label.place(relx=0.5, rely=0.8, anchor='center') #centers textbox
 
 root1.bind("<space>", on_space)  # bind space key
 root1.mainloop()
-'''
