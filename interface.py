@@ -1,8 +1,8 @@
+
 import tkinter as tk
 from PIL import Image, ImageTk
 import cv2
 import numpy as np
-
 
 #gives name of region when clicked
 def on_click(event):
@@ -108,13 +108,9 @@ def on_click(event):
 
 
 # opens risk board image
-def open_image(canvas):
+def open_image(canvas, img_cv):
 
-    global img_cv
-    image_path = 'riskboard_resized.jpg'
-    img_cv = cv2.imread(image_path)
-
-
+    
     img_rgb = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
     img_pil = Image.fromarray(img_rgb)
     img_tk = ImageTk.PhotoImage(img_pil)
@@ -123,8 +119,33 @@ def open_image(canvas):
     canvas.image = img_tk
 
 
+#########MAKE NEW FUNCTION CALLED UPDATE BOARD NUMB TO UPDATE TROOP NUMBER AND OWNERSHIP
+def update_region(canvas, edges):
+    #light background
+    labeled_img = np.ones((edges.shape[0], edges.shape[1], 3), dtype=np.uint8) * 255  # White background
+    labeled_img[edges != 0] = (0, 0, 0)
+
+    #text labeling 
+    for idx, contour in enumerate(regions):
+        # Get center point of contour (via moments)
+        M = cv2.moments(contour)
+        if M["m00"] != 0:
+            cx = int(M["m10"] / M["m00"])
+            cy = int(M["m01"] / M["m00"])
+            cv2.putText(labeled_img, str(idx + 1), (cx, cy),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+
+    open_image(canvas, labeled_img)
+
+
+
+
+
+
+
+
 #edge detector
-def detect_edges():
+def detect_edges(canvas):
     global regions
 
     # Convert to grayscale and detect edges
@@ -143,25 +164,11 @@ def detect_edges():
     contours, _ = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     regions = [cv2.approxPolyDP(cnt, 3, True) for cnt in contours]
 
-    region_colors = {i: (0, 0, 0, 0) for i in range(len(regions))}
-
-    # Set initial region colors (BGR format)
-    region_colors[162] = (0, 0, 255)  # Alaska = red
-    region_colors[168] = (0, 255, 0)  # Kamchatka = green
-    region_colors[142] = (255, 0, 0)  # Quebec = blue
+    update_region(canvas, edges)
 
 
 
-
-
-
-
-
-
-
-
-#overlaps the window over the edge detector
-
+#actual game
 def gamespace():
     root = tk.Tk()
     root.title("Risk Game")
@@ -170,12 +177,13 @@ def gamespace():
     canvas = tk.Label(root)
     canvas.pack()
 
-    #img_cv = None    kept here js in case
-    #regions = []
-
     #open image and detect edges
-    open_image(canvas)
-    detect_edges()
+    global img_cv
+    image_path = 'riskboard_resized.jpg'
+    img_cv = cv2.imread(image_path)
+    
+    open_image(canvas,img_cv)
+    detect_edges(canvas)
 
     #space does space function
     canvas.bind("<Button-1>", on_click)
