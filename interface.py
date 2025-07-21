@@ -60,6 +60,7 @@ region_to_name = {
 
 def next_stage():
     ######################NEED TO GO TO NEXT STAGE
+    '''
     if turn == player:
         if stage == deploy_phase:
             stage = attack_phase:
@@ -76,8 +77,7 @@ def next_stage():
         if stage == fortify_phase:
             turn = player
             stage = deploy_phase
-
-
+'''
 
 
 
@@ -88,7 +88,6 @@ def on_click(event):
         region_num = i+1
         if cv2.pointPolygonTest(region, (event.x, event.y), False) >= 0:
             print(f"Clicked inside region {region_num}")
-
             try:
                 region_name = region_to_name[region_num]
             except KeyError:
@@ -206,7 +205,7 @@ def update_region(canvas, edges):
     #light background
     labeled_img = np.ones((edges.shape[0], edges.shape[1], 3), dtype=np.uint8) * 255  # White background
     labeled_img[edges != 0] = (0, 0, 0)
-
+    
     # functionality: Labels each region with their respective number
     # for idx, contour in enumerate(regions):
     #     # Get center point of contour (via moments)
@@ -225,9 +224,27 @@ def update_region(canvas, edges):
             # Skip if the region number is out of bounds
         if region_num - 1 < 0 or region_num - 1 >= len(regions):
             continue
+        
 
         region = regions[region_num - 1]  # get the contour by index
 
+        #colors for each region based on owner
+
+        ##########################################need to implement
+        #if region_name in player:
+        #    cv2.drawContours(labeled_img, [region], -1, (0,255,0), thickness=cv2.FILLED)
+        #if region_name in ai:
+        #    cv2.drawContours(labeled_img, [region], -1, (0,0,255), thickness=cv2.FILLED)
+        
+        ##need to fix
+        index = 0
+        for i in regions:
+            index += 1
+            for region_num in region_to_name.items():
+                if index != region_num:
+                    cv2.drawContours(labeled_img, [i], -1, (255, 0, 0), thickness=cv2.FILLED)
+        if region_num == 163:
+            cv2.drawContours(labeled_img, [region], -1, (0, 0, 255), thickness=cv2.FILLED)  # Blue for Alaska
         # Calculate center of the region using image moments
         M = cv2.moments(region)
         if M["m00"] != 0:
