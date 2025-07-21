@@ -4,7 +4,60 @@ from PIL import Image, ImageTk
 import cv2
 import numpy as np
 
+
 #gives name of region when clicked
+
+region_to_name = {
+        163: "Alaska",
+        169: "Northwest Territory",
+        177: "Greenland",
+        140: "Alberta",
+        139: "Ontario",
+        143: "Quebec",
+        114: "Western United States",
+        112: "Eastern United States",
+        86: "Central America",
+        64: "Venezuela",
+        54: "Peru",
+        56: "Brazil",
+        25: "Argentina",
+        15: "South Africa",
+        9: "Madagascar",
+        29: "Congo",
+        49: "East Africa",
+        67: "North Africa",
+        61: "Egypt",
+        145: "Iceland",
+        127: "Great Britain",
+        130: "Great Britain",
+        95: "Western Europe",
+        94: "Southern Europe",
+        122: "Nothern Europe",
+        161: "Scandinavia",
+        160: "Ukraine",
+        78: "Middle East",
+        113: "Afghanistan",
+        83: "India",
+        167: "Ural",
+        175: "Siberia",
+        172: "Yakutsk",
+        144: "Irkutsk",
+        168: "Kamchatka",
+        120: "Japan",
+        118: "Mongolia",
+        107: "China",
+        69: "Siam",
+        28: "Indonesia",
+        36: "Indonesia",
+        27: "Indonesia",
+        17: "Indonesia",
+        20: "Indonesia",
+        43: "New Guinea",
+        44: "New Guinea",
+        14: "Western Australia",
+        21: "Eastern Australia"
+    }
+
 def on_click(event):
     region_name = "Not a Region"
     #print(f"Mouse clicked at {event.x}, {event.y}")
@@ -12,98 +65,104 @@ def on_click(event):
         region_num = i+1
         if cv2.pointPolygonTest(region, (event.x, event.y), False) >= 0:
             print(f"Clicked inside region {region_num}")
-            if region_num == 163:
-                region_name = "Alaska"
-            elif region_num == 169:
-                region_name = "Northwest Territory"
-            elif region_num == 177:
-                region_name = "Greenland"
-            elif region_num == 140:
-                region_name = "Alberta"
-            elif region_num == 139:
-                region_name = "Ontario"
-            elif region_num == 143:
-                region_name = "Quebec"
-            elif region_num == 114:
-                region_name = "Western United States"
-            elif region_num == 112:
-                region_name = "Eastern United States"
-            elif region_num == 86:
-                region_name = "Central America"
-            elif region_num == 64:
-                region_name = "Venezuela"
-            elif region_num == 54:
-                region_name = "Peru"
-            elif region_num == 56:
-                region_name = "Brazil"
-            elif region_num == 25:
-                region_name = "Argentina"
-            elif region_num == 15:
-                region_name = "South Africa"
-            elif region_num == 9:
-                region_name = "Madagascar"
-            elif region_num == 29:
-                region_name = "Congo"
-            elif region_num == 49:
-                region_name = "East Africa"
-            elif region_num == 67:
-                region_name = "North Africa"
-            elif region_num == 61:
-                region_name = "Egypt"
-            elif region_num == 145:
-                region_name = "Iceland"
-            elif region_num == 127 or region_num == 130:
-                region_name = "Great Britain"
-            elif region_num == 95:
-                region_name = "Western Europe"
-            elif region_num == 94:
-                region_name = "Southern Europe"
-            elif region_num == 122:
-                region_name = "Nothern Europe"
-            elif region_num == 161:
-                region_name = "Scandinavia"
-            elif region_num == 160:
-                region_name = "Ukraine"
-            elif region_num == 78:
-                region_name = "Middle East"
-            elif region_num == 113:
-                region_name = "Afghanistan"
-            elif region_num == 83:
-                region_name = "India"
-            elif region_num == 167:
-                region_name = "Ural"
-            elif region_num == 175:
-                region_name = "Siberia"
-            elif region_num == 172:
-                region_name = "Yakutsk"
-            elif region_num == 144:
-                region_name = "Irkutsk"
-            elif region_num == 168:
-                region_name = "Kamchatka"
-            elif region_num == 120:
-                region_name = "Japan"
-            elif region_num == 118:
-                region_name = "Mongolia"
-            elif region_num == 107:
-                region_name = "China"
-            elif region_num == 69:
-                region_name = "Siam"
-            elif region_num == 28 or region_num == 36 or region_num == 27 or region_num == 17 or region_num == 20:
-                region_name = "Indonesia"
-            elif region_num == 43 or region_num == 44:
-                region_name = "New Guinea"
-            elif region_num ==  14:
-                region_name = "Western Australia"
-            elif region_num == 21:
-                region_name = "Eastern Australia"
-            elif region_num == 176:
-                pass #prevent not a region error
-            elif region_num == 178:
+
+            try:
+                region_name = region_to_name[region_num]
+            except KeyError:
                 pass
-            elif region_num == 170:
-                pass
-            else:
-                print("Not a Region")
+
+            # if region_num == 163:
+            #     region_name = "Alaska"
+            # elif region_num == 169:
+            #     region_name = "Northwest Territory"
+            # elif region_num == 177:
+            #     region_name = "Greenland"
+            # elif region_num == 140:
+            #     region_name = "Alberta"
+            # elif region_num == 139:
+            #     region_name = "Ontario"
+            # elif region_num == 143:
+            #     region_name = "Quebec"
+            # elif region_num == 114:
+            #     region_name = "Western United States"
+            # elif region_num == 112:
+            #     region_name = "Eastern United States"
+            # elif region_num == 86:
+            #     region_name = "Central America"
+            # elif region_num == 64:
+            #     region_name = "Venezuela"
+            # elif region_num == 54:
+            #     region_name = "Peru"
+            # elif region_num == 56:
+            #     region_name = "Brazil"
+            # elif region_num == 25:
+            #     region_name = "Argentina"
+            # elif region_num == 15:
+            #     region_name = "South Africa"
+            # elif region_num == 9:
+            #     region_name = "Madagascar"
+            # elif region_num == 29:
+            #     region_name = "Congo"
+            # elif region_num == 49:
+            #     region_name = "East Africa"
+            # elif region_num == 67:
+            #     region_name = "North Africa"
+            # elif region_num == 61:
+            #     region_name = "Egypt"
+            # elif region_num == 145:
+            #     region_name = "Iceland"
+            # elif region_num == 127 or region_num == 130:
+            #     region_name = "Great Britain"
+            # elif region_num == 95:
+            #     region_name = "Western Europe"
+            # elif region_num == 94:
+            #     region_name = "Southern Europe"
+            # elif region_num == 122:
+            #     region_name = "Nothern Europe"
+            # elif region_num == 161:
+            #     region_name = "Scandinavia"
+            # elif region_num == 160:
+            #     region_name = "Ukraine"
+            # elif region_num == 78:
+            #     region_name = "Middle East"
+            # elif region_num == 113:
+            #     region_name = "Afghanistan"
+            # elif region_num == 83:
+            #     region_name = "India"
+            # elif region_num == 167:
+            #     region_name = "Ural"
+            # elif region_num == 175:
+            #     region_name = "Siberia"
+            # elif region_num == 172:
+            #     region_name = "Yakutsk"
+            # elif region_num == 144:
+            #     region_name = "Irkutsk"
+            # elif region_num == 168:
+            #     region_name = "Kamchatka"
+            # elif region_num == 120:
+            #     region_name = "Japan"
+            # elif region_num == 118:
+            #     region_name = "Mongolia"
+            # elif region_num == 107:
+            #     region_name = "China"
+            # elif region_num == 69:
+            #     region_name = "Siam"
+            # elif region_num == 28 or region_num == 36 or region_num == 27 or region_num == 17 or region_num == 20:
+            #     region_name = "Indonesia"
+            # elif region_num == 43 or region_num == 44:
+            #     region_name = "New Guinea"
+            # elif region_num ==  14:
+            #     region_name = "Western Australia"
+            # elif region_num == 21:
+            #     region_name = "Eastern Australia"
+            # elif region_num == 176:
+            #     pass #prevent not a region error
+            # elif region_num == 178:
+            #     pass
+            # elif region_num == 170:
+            #     pass
+            # else:
+            #     print("Not a Region")
     print(region_name)
 
 
@@ -125,15 +184,42 @@ def update_region(canvas, edges):
     labeled_img = np.ones((edges.shape[0], edges.shape[1], 3), dtype=np.uint8) * 255  # White background
     labeled_img[edges != 0] = (0, 0, 0)
 
-    #text labeling 
-    for idx, contour in enumerate(regions):
-        # Get center point of contour (via moments)
-        M = cv2.moments(contour)
-        if M["m00"] != 0:
-            cx = int(M["m10"] / M["m00"])
-            cy = int(M["m01"] / M["m00"])
-            cv2.putText(labeled_img, str(idx + 1), (cx, cy),
-            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+    # functionality: Labels each region with their respective number
+    # for idx, contour in enumerate(regions):
+    #     # Get center point of contour (via moments)
+    #     M = cv2.moments(contour)
+    #     if M["m00"] != 0:
+    #         cx = int(M["m10"] / M["m00"])
+    #         cy = int(M["m01"] / M["m00"])
+    #         cv2.putText(labeled_img, str(idx + 1), (cx, cy),
+    #         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+
+    # Functionality: labels 
+    for region_num, region_name in region_to_name.items():
+            # Skip if the region number is out of bounds
+            if region_num - 1 < 0 or region_num - 1 >= len(regions):
+                continue
+
+            region = regions[region_num - 1]  # get the contour by index
+
+            # Calculate center of the region using image moments
+            M = cv2.moments(region)
+            if M["m00"] != 0:
+                cx = int(M["m10"] / M["m00"])
+                cy = int(M["m01"] / M["m00"])
+
+                # Draw the name on the image
+                cv2.putText(
+                    labeled_img,             # image you're writing on
+                    region_name,             # name to draw
+                    (cx, cy),                # location (center of region)
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.4,                     # font scale
+                    (0, 255, 0),             # green text
+                    1,                       # thickness
+                    cv2.LINE_AA              # anti-aliased
+                )
+
 
     open_image(canvas, labeled_img)
 
