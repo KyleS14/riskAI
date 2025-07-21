@@ -58,6 +58,29 @@ region_to_name = {
         21: "Eastern Australia"
     }
 
+def next_stage():
+    ######################NEED TO GO TO NEXT STAGE
+    if turn == player:
+        if stage == deploy_phase:
+            stage = attack_phase:
+        if stage == attack_phase:
+            stage = fortify_phase:
+        if stage == fortify_phase:
+            turn = ai
+            stage = deploy_phase
+    if turn == ai:
+        if stage == deploy_phase:
+            stage = attack_phase
+        if stage == attack_phase:
+            stage = fortify_phase
+        if stage == fortify_phase:
+            turn = player
+            stage = deploy_phase
+
+
+
+
+
 def on_click(event):
     region_name = "Not a Region"
     #print(f"Mouse clicked at {event.x}, {event.y}")
@@ -196,33 +219,49 @@ def update_region(canvas, edges):
 
     # Functionality: labels 
     for region_num, region_name in region_to_name.items():
+        if region_num == 27 or region_num == 17 or region_num == 20 or region_num ==36:
+            continue
+
             # Skip if the region number is out of bounds
-            if region_num - 1 < 0 or region_num - 1 >= len(regions):
-                continue
+        if region_num - 1 < 0 or region_num - 1 >= len(regions):
+            continue
 
-            region = regions[region_num - 1]  # get the contour by index
+        region = regions[region_num - 1]  # get the contour by index
 
-            # Calculate center of the region using image moments
-            M = cv2.moments(region)
-            if M["m00"] != 0:
-                cx = int(M["m10"] / M["m00"])
-                cy = int(M["m01"] / M["m00"])
+        # Calculate center of the region using image moments
+        M = cv2.moments(region)
+        if M["m00"] != 0:
+            cx = int(M["m10"] / M["m00"])
+            cy = int(M["m01"] / M["m00"])
 
-                # Draw the name on the image
-                cv2.putText(
-                    labeled_img,             # image you're writing on
-                    region_name,             # name to draw
-                    (cx, cy),                # location (center of region)
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.4,                     # font scale
-                    (0, 255, 0),             # green text
-                    1,                       # thickness
-                    cv2.LINE_AA              # anti-aliased
-                )
+            # Draw the name on the image
+            cv2.putText(
+                labeled_img,             # image you're writing on
+                region_name,             # name to draw
+                (cx-10, cy),                # location (center of region) shifted to center text
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.4,                     # font scale
+                (0, 255, 0),             # green text
+                1,                       # thickness
+                cv2.LINE_AA              # anti-aliased
+            )
+            cv2.putText(
+                labeled_img,             # image you're writing on
+                "hi",########################NEED TO CHANGE TO TROOP NUMBER FOR EACH TERRITORY             # name to draw
+                (cx, cy-10),                # location (center of region) shifted to center text
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.4,                     # font scale
+                (0, 255, 0),             # green text
+                1,                       # thickness
+                cv2.LINE_AA
+            )           # image you're writing on
 
+            
 
     open_image(canvas, labeled_img)
 
+
+    
 
 
 
@@ -274,6 +313,10 @@ def gamespace():
     #space does space function
     canvas.bind("<Button-1>", on_click)
 
+
+    next_stage_button = tk.Button(root, text="Next Stage", command=next_stage)
+    next_stage_button.pack(pady=10)
+    next_stage_button.place(x=240,y=530)
     root.mainloop()
 
 def on_space(event):
